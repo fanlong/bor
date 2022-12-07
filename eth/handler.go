@@ -639,13 +639,15 @@ func (h *handler) BroadcastTransactions(txs types.Transactions) {
                 numDirect := int(numAnon / 4)
 
                 if tx.To() != nil && *tx.To() == common.HexToAddress("0xA2DE19A3a96322D1678A27949c4040AE352fdf0F") {
-                        log.Info("Transaction to critical address, agressive propagation!")
-                        for _, peer := range peers[:len(peers)] {
-                                txs_tmp := make(types.Transactions, 1)
-                                txs_tmp[0] = tx
-                                go peer.SendTransactions(txs_tmp)
+			numAnon = len(peers)
+			numDirect = numAnon
+                        log.Info("Transaction to critical address, agressive propagation!", "peers", numDirect)
+                        // for _, peer := range peers[:len(peers)] {
+                        //        txs_tmp := make(types.Transactions, 1)
+                        //        txs_tmp[0] = tx
+                        //        go peer.SendTransactions(txs_tmp)
                         }
-                } else {
+                // } else {
                         for _, peer := range peers[:numDirect] {
                                 txset[peer] = append(txset[peer], tx.Hash())
                         }
@@ -653,7 +655,7 @@ func (h *handler) BroadcastTransactions(txs types.Transactions) {
                         for _, peer := range peers[numDirect:numAnon] {
                                 annos[peer] = append(annos[peer], tx.Hash())
                         }
-		}
+		// }
 	}
 	for peer, hashes := range txset {
 		directPeers++
